@@ -40,9 +40,10 @@ class Usuario {
 
     /**
      * Valida los datos del usuario antes de guardar
+     * @param {string} password - Contraseña en texto plano para validar
      * @returns {Object} - Objeto con isValid y errors
      */
-    validate() {
+    validate(password = null) {
         const errors = [];
 
         if (!this.nombre || this.nombre.trim().length < 2) {
@@ -53,7 +54,9 @@ class Usuario {
             errors.push('El correo electrónico no es válido');
         }
 
-        if (!this.password_hash || this.password_hash.length < 6) {
+        // Validar contraseña - usar el parámetro password si está disponible
+        const passwordToValidate = password || this.password_hash;
+        if (!passwordToValidate || passwordToValidate.length < 6) {
             errors.push('La contraseña debe tener al menos 6 caracteres');
         }
 
@@ -83,7 +86,7 @@ class Usuario {
      * @returns {Promise<Usuario>} - Usuario creado con ID asignado
      */
     async create(password) {
-        const validation = this.validate();
+        const validation = this.validate(password);
         if (!validation.isValid) {
             throw new Error(`Datos inválidos: ${validation.errors.join(', ')}`);
         }
